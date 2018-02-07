@@ -1,7 +1,7 @@
 # zigzag copy
 
 ## compile
-nvcc -o zzcpy zzcpy.cu -arch sm_70
+```nvcc -o zzcpy zzcpy.cu -arch sm_70```
 
 ## run
-./zzcpy > result.csv
+```./zzcpy > result.csv```
