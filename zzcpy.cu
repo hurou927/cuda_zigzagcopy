@@ -120,10 +120,10 @@ void execGPUkerenel(size_t input_width){
 
 int main(int argc,char **argv){
 	
-	GPUBoost(100);
+	GPUBoost(64);
 
-	for(size_t n=256;n<=32*1024;n=n*2)
-		execGPUkerenel<float,  32, 512>(n); // type:float, tilesize:32x32, the numeber of threads:1024
+	for(size_t n=256;n<32*1024;n=n*2)
+		execGPUkerenel<float,  32, 512>(n); // type:float, tilesize:32x32, the numeber of threads:512
 	for(size_t n=256;n<=32*1024;n=n*2)
 		execGPUkerenel<float,  64, 512>(n);
 	for(size_t n=256;n<=32*1024;n=n*2)
