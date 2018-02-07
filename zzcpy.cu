@@ -48,7 +48,7 @@ __global__ void zigzagCopy(T* G_IN, T *G_OUT, uint64 *XYPOS, unsigned int INPUTW
 template <typename T ,unsigned int TILEWIDTH  ,unsigned int NUMTHREADS>
 void execGPUkerenel(size_t input_width){
 	cudaProfilerStart();
-	cudatimeStamp ts(10);
+	cudatimeStamp cudatimer(10);
 	//printf("%d\n",CUDART_VERSION);
 
 	size_t numTiles = (input_width / TILEWIDTH) * (input_width / TILEWIDTH);
@@ -88,18 +88,18 @@ void execGPUkerenel(size_t input_width){
 	cudaMemcpy(d_xy_pos,xy_pos,sizeof(uint64)*numTiles ,cudaMemcpyHostToDevice);
 	checkCudaStatus();
 	
-	ts.stamp();
+	cudatimer.stamp();
 	for(int i=0;i<LOOPCOUNT;i++)
 		zigzagCopy <T,TILEWIDTH,NUMTHREADS> <<< numblocks , NUMTHREADS , sharedSize >>> (d_in, d_out, d_xy_pos, input_width);
 
-	ts.stamp();
+	cudatimer.stamp();
 	//memcpy Device->Deivce
 	for(int i=0;i<LOOPCOUNT;i++)
 		cudaMemcpy(d_out,d_in,sizeof(T)*num_items,cudaMemcpyDeviceToDevice);
-	ts.stamp();
+	cudatimer.stamp();
 	
 	printf("input,%zux%zu,tile,%dx%d,numthreads,%d,numblocks,%zu,type,%s,zigzagcopy,%f,ms,cudaMemcpy,%f,ms,",
-		input_width,input_width,TILEWIDTH,TILEWIDTH,NUMTHREADS,numblocks,typeid(T).name(),ts.interval(0,1)/LOOPCOUNT,ts.interval(1,2)/LOOPCOUNT);
+		input_width,input_width,TILEWIDTH,TILEWIDTH,NUMTHREADS,numblocks,typeid(T).name(),cudatimer.interval(0,1)/LOOPCOUNT,cudatimer.interval(1,2)/LOOPCOUNT);
 
 	printf("occupancy,%4.3f,SMcount,%d,activeblock,%d,",
 		occupancy(zigzagCopy<T,TILEWIDTH,NUMTHREADS>,NUMTHREADS,sharedSize),
